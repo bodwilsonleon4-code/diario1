@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario de Anotaciones</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #6a5acd;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .entry {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+        .entry:last-child {
+            border-bottom: none;
+        }
+        .entry h2 {
+            color: #6a5acd;
+            margin-bottom: 0.5rem;
+        }
+        .entry p {
+            margin: 0.5rem 0;
+        }
+        .date {
+            font-style: italic;
+            color: #888;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #6a5acd;
+            color: white;
+            margin-top: 2rem;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        button {
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5a4acd;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mi Diario de Anotaciones</h1>
+    </header>
+    
+    <div class="container">
+        <div class="entry">
+            <h2>Bienvenido a tu diario</h2>
+            <p>Este es un espacio para que escribas tus pensamientos, ideas o anotaciones importantes.</p>
+            <p class="date">Última actualización: <span id="current-date"></span></p>
+        </div>
+
+        <div class="entry">
+            <h2>Añadir una nueva anotación</h2>
+            <textarea id="new-entry" placeholder="Escribe aquí tu anotación..."></textarea>
+            <button onclick="addEntry()">Guardar Anotación</button>
+        </div>
+
+        <div id="entries"></div>
+    </div>
+
+    <footer>
+        <p>© 2026 - Mi Diario Personal</p>
+    </footer>
+
+    <script>
+        // Cargar anotaciones guardadas
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEntries();
+            updateDate();
+        });
+
+        // Actualizar fecha actual
+        function updateDate() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
+        }
+
+        // Añadir una nueva anotación
+        function addEntry() {
+            const entryText = document.getElementById('new-entry').value.trim();
+            if (entryText === '') return;
+
+            const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            const now = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const dateTime = now.toLocaleDateString('es-ES', options);
+
+            entries.push({ text: entryText, date: dateTime });
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+            document.getElementById('new-entry').value = '';
+            loadEntries();
+        }
+
+        // Cargar anotaciones en la página
+        function loadEntries() {
+            const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            const entriesDiv = document.getElementById('entries');
+            
+            if (entries.length === 0) {
+                entriesDiv.innerHTML = '<p>No hay anotaciones aún. ¡Empieza a escribir!</p>';
+                return;
+            }
+
+            let html = '<h2>Tus Anotaciones</h2>';
+            entries.forEach((entry, index) => {
+                html += `
+                    <div class="entry">
+                        <p><strong>${entry.date}</strong></p>
+                        <p>${entry.text}</p>
+                    </div>
+                `;
+            });
+
+            entriesDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
